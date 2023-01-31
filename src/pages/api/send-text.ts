@@ -1,17 +1,25 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import twilio from "twilio";
 import { env } from "../../env/server.mjs";
+import sgMail from "@sendgrid/mail";
 
 const sendText = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { message } = req.query;
-  if (typeof message !== "string") return res.status(400).end();
-  const client = twilio(env.TWILIO_ACCOUNT_SID, env.TWILIO_AUTH_TOKEN);
-  const twilioMessage = await client.messages.create({
-    body: message,
-    from: env.TWILIO_PHONE_NUMBER,
-    to: env.MY_PHONE_NUMBER,
-  });
-  res.status(200).json({ twilioMessage });
+  const { message, subject } = req.query;
+  if (typeof message !== "string" || (subject && typeof subject !== "string")) {
+    return res.status(400).end();
+  }
+  sgMail.setApiKey(env.SENDGRID_API_KEY);
+  const sgMessage = {
+    to: env.MY_EMAIL_PHONE_NUMBER,
+    from: env.SENDGRID_SENDER_EMAIL,
+    subject: subject || "No subject",
+    text: message,
+  };
+  try {
+    const sgResponse = await sgMail.send(sgMessage);
+    res.status(200).json(sgResponse);
+  } catch (error) {
+    res.status(400).json(error);
+  }
 };
 
 export default sendText;

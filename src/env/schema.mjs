@@ -12,6 +12,7 @@ export const serverSchema = z.object({
   TWILIO_AUTH_TOKEN: z.string(),
   TWILIO_PHONE_NUMBER: z.string(),
   MY_PHONE_NUMBER: z.string(),
+  MY_EMAIL_PHONE_NUMBER: z.string(),
   MY_EMAIL: z.string(),
   SENDGRID_API_KEY: z.string(),
   SENDGRID_SENDER_EMAIL: z.string(),
