@@ -1,50 +1,46 @@
-# Create T3 App
+# send-to-makon
 
-This is an app bootstrapped according to the [init.tips](https://init.tips) stack, also known as the T3-Stack.
+Small Next.js app with three fixed-recipient message endpoints:
 
-## Why are there `.js` files in here?
+- `/api/send-email?subject=...&message=...&imageUrl=...`
+- `/api/send-text?subject=...&message=...&imageUrl=...`
+- `/api/send-telegram?subject=...&message=...&imageUrl=...`
 
-As per [T3-Axiom #3](https://github.com/t3-oss/create-t3-app/tree/next#3-typesafety-isnt-optional), we take typesafety as a first class citizen. Unfortunately, not all frameworks and plugins support TypeScript which means some of the configuration files have to be `.js` files.
+Email and text deliver through Gmail SMTP using Nodemailer. Telegram delivers
+through the Telegram Bot API.
 
-We try to emphasize that these files are javascript for a reason, by explicitly declaring its type (`cjs` or `mjs`) depending on what's supported by the library it is used by. Also, all the `js` files in this project are still typechecked using a `@ts-check` comment at the top.
+Optional `imageUrl` must be HTTP(S). Telegram sends it as a photo; email and
+text include the URL.
 
-## What's next? How do I make an app with this?
+OpenAPI docs are available at `/api/openapi.json`.
 
-We try to keep this project as simple as possible, so you can start with the most basic configuration and then move on to more advanced configuration.
+## Environment
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+Required:
 
-- [Next-Auth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [TailwindCSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io) (using @next version? [see v10 docs here](https://trpc.io/docs/v10/))
+- `MY_EMAIL`: email recipient for `/api/send-email`
+- `MY_EMAIL_PHONE_NUMBER`: email-to-SMS/MMS recipient for `/api/send-text`
+- `SMTP_PASS`: Gmail app password for `sendtomakon@gmail.com`
+- `TELEGRAM_BOT_TOKEN`: Telegram bot token
+- `TELEGRAM_CHAT_ID`: Telegram chat, group, or channel id for
+  `/api/send-telegram`
 
-Also checkout these awesome tutorials on `create-t3-app`.
+The Gmail SMTP host, port, TLS mode, username, and sender are hardcoded in
+`src/server/smtp-mail.ts` to `sendtomakon@gmail.com`.
 
-- [Build a Blog With the T3 Stack - tRPC, TypeScript, Next.js, Prisma & Zod](https://www.youtube.com/watch?v=syEWlxVFUrY)
-- [Build a Live Chat Application with the T3 Stack - TypeScript, Tailwind, tRPC](https://www.youtube.com/watch?v=dXRRY37MPuk)
-- [Build a full stack app with create-t3-app](https://www.nexxel.dev/blog/ct3a-guestbook)
-- [A first look at create-t3-app](https://dev.to/ajcwebdev/a-first-look-at-create-t3-app-1i8f)
+Environment variables are validated with the current Create T3 App-style
+`@t3-oss/env-nextjs` setup in `src/env.mjs`.
 
-## How do I deploy this?
+## Development
 
-### Vercel
+```sh
+npm install
+npm run dev
+```
 
-We recommend deploying to [Vercel](https://vercel.com/?utm_source=t3-oss&utm_campaign=oss). It makes it super easy to deploy NextJs apps.
+## Production
 
-- Push your code to a GitHub repository.
-- Go to [Vercel](https://vercel.com/?utm_source=t3-oss&utm_campaign=oss) and sign up with GitHub.
-- Create a Project and import the repository you pushed your code to.
-- Add your environment variables.
-- Click **Deploy**
-- Now whenever you push a change to your repository, Vercel will automatically redeploy your website!
-
-### Docker
-
-You can also dockerize this stack and deploy a container. See the [Docker deployment page](https://create-t3-app-nu.vercel.app/en/deployment/docker) for details.
-
-## Useful resources
-
-Here are some resources that we commonly refer to:
-
-- [Protecting routes with Next-Auth.js](https://next-auth.js.org/configuration/nextjs#unstable_getserversession)
+```sh
+npm run build
+npm run start
+```

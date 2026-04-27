@@ -1,24 +1,31 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { env } from "../../env/server.mjs";
-import sgMail from "@sendgrid/mail";
+import { env } from "../../env.mjs";
+import { isHttpUrl } from "../../server/query";
+import { mailErrorResponse, sendMail } from "../../server/smtp-mail";
 
 const sendText = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { message, subject } = req.query;
-  if (typeof message !== "string" || (subject && typeof subject !== "string")) {
+  const { message, subject, imageUrl } = req.query;
+  if (
+    typeof message !== "string" ||
+    (subject && typeof subject !== "string") ||
+    (imageUrl && (typeof imageUrl !== "string" || !isHttpUrl(imageUrl)))
+  ) {
     return res.status(400).end();
   }
-  sgMail.setApiKey(env.SENDGRID_API_KEY);
-  const sgMessage = {
+
+  const resolvedImageUrl = typeof imageUrl === "string" ? imageUrl : undefined;
+  const localMessage = {
+    pass: env.SMTP_PASS,
     to: env.MY_EMAIL_PHONE_NUMBER,
-    from: env.SENDGRID_SENDER_EMAIL,
     subject: subject || "No subject",
-    text: message,
+    text: resolvedImageUrl ? `${message}\n\n${resolvedImageUrl}` : message,
   };
+
   try {
-    const sgResponse = await sgMail.send(sgMessage);
-    res.status(200).json(sgResponse);
+    await sendMail(localMessage);
+    res.status(200).json({ ok: true });
   } catch (error) {
-    res.status(400).json(error);
+    res.status(500).json(mailErrorResponse(error));
   }
 };
 
