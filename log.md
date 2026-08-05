@@ -1,0 +1,1 @@
+- [2026-08-05] Restricted npm cache: npm registry commands can fail with `EPERM` when they use `~/.npm` in a restricted Codex session. When this matters, use a task-specific cache path under `/tmp` for `npm view`, `npm install`, and `npx`.
