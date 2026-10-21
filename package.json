@@ -11,14 +11,13 @@
   "dependencies": {
     "@t3-oss/env-nextjs": "^0.13.11",
     "next": "16.4.1",
-    "nodemailer": "^8.0.7",
+    "nodemailer": "^10.1.7",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
-    "@types/nodemailer": "^8.0.0",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.4",
     "@typescript-eslint/eslint-plugin": "^8.59.1",
